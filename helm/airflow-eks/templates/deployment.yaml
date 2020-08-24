@@ -1,0 +1,88 @@
+# Airflow
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow
+spec:
+  selector:
+    matchLabels:
+      app: airflow
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: airflow
+    spec:
+      initContainers:
+        - name: init-db
+          image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
+          imagePullPolicy: Always
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - "/bootstrap.sh"
+      containers:
+      - name: web
+        image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
+        imagePullPolicy: Always
+        ports:
+        - name: web
+          containerPort: 8080
+        command:
+          - "/entrypoint.sh"
+        args:
+          - "webserver"
+        env:
+          - name: LOAD_EX
+            value: "n"
+          - name: EXECUTOR
+            value: "Local"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 240
+          periodSeconds: 60
+      - name: scheduler
+        image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
+        imagePullPolicy: Always
+        command:
+          - "/entrypoint.sh"
+        args:
+          - "scheduler"
+      - name: worker
+        image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
+        imagePullPolicy: Always
+        command:
+          - "/entrypoint.sh"
+        args:
+          - "worker"
+      - name: postgres
+        image: postgres:9.6
+        ports:
+        - name: postgres
+          containerPort: 5432
+        env:
+          - name: POSTGRES_USER
+            value: "airflow"
+          - name: POSTGRES_PASSWORD
+            value: "airflow"
+          - name: POSTGRES_DB
+            value: "airflow"
+      nodeSelector:
+        kubernetes.io/os: "{{ .Values.node_selector.os }}"
+---
+# LoadBalancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow
+spec:
+  type: LoadBalancer
+  selector:
+    app: airflow
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

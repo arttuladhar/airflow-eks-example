@@ -12,6 +12,10 @@ RUN chmod +x /bootstrap.sh
 
 
 COPY requirements.txt /requirements.txt
+
+# Installing Dependencies
+# RUN pip3 install 'apache-airflow[kubernetes]'
+
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /requirements.txt
 

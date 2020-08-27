@@ -18,7 +18,7 @@ if [ $? -eq 0 ]; then
   aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_URL
 fi
 
-docker builder prune --filter type=exec.cachemount
+# docker builder prune --filter type=exec.cachemount
 docker build --no-cache -t art-airflow docker/
 docker tag art-airflow:latest $ECR_BASE_URL
 

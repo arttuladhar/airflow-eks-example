@@ -1,0 +1,49 @@
+# Nodes
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pods-access-default
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "deployments", "pods/exec", "persistentvolumeclaims", "secrets"]
+    verbs: ["get", "watch", "list", "log", "create", "update", "patch", "delete", "read"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pods-access-default
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: pods-access-default
+  apiGroup: rbac.authorization.k8s.io
+---
+# apiVersion: rbac.authorization.k8s.io/v1beta1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: airflow-create-pod
+# subjects:
+#   - kind: ServiceAccount
+#     name: default
+#     namespace: default
+# roleRef:
+#   kind: ClusterRole
+#   name: cluster-admin
+#   apiGroup: rbac.authorization.k8s.io
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1beta1
+# kind: ClusterRoleBinding
+# metadata:
+#   name: airflow-fargate-create-pod
+# subjects:
+#   - kind: ServiceAccount
+#     name: default
+#     namespace: fargate
+# roleRef:
+#   kind: ClusterRole
+#   name: cluster-admin
+#   apiGroup: rbac.authorization.k8s.io

@@ -13,22 +13,23 @@ spec:
       labels:
         app: airflow
     spec:
-      initContainers:
-        - name: init-db
-          image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
-          imagePullPolicy: Always
-          command:
-            - "/bin/sh"
-          args:
-            - "-c"
-            - "/bootstrap.sh"
       containers:
+      - name: postgres
+        image: postgres:9.6
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_USER
+            value: "airflow"
+          - name: POSTGRES_PASSWORD
+            value: "airflow"
+          - name: POSTGRES_DB
+            value: "airflow"
       - name: web
         image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
         imagePullPolicy: Always
         ports:
-        - name: web
-          containerPort: 8080
+        - containerPort: 8080          
         command:
           - "/entrypoint.sh"
         args:
@@ -42,7 +43,7 @@ spec:
           httpGet:
             path: /
             port: 8080
-          initialDelaySeconds: 240
+          initialDelaySeconds: 10
           periodSeconds: 60
       - name: scheduler
         image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
@@ -51,27 +52,6 @@ spec:
           - "/entrypoint.sh"
         args:
           - "scheduler"
-      - name: worker
-        image: "{{ .Values.dags_image.repository }}:{{ .Values.dags_image.tag }}"
-        imagePullPolicy: Always
-        command:
-          - "/entrypoint.sh"
-        args:
-          - "worker"
-      - name: postgres
-        image: postgres:9.6
-        ports:
-        - name: postgres
-          containerPort: 5432
-        env:
-          - name: POSTGRES_USER
-            value: "airflow"
-          - name: POSTGRES_PASSWORD
-            value: "airflow"
-          - name: POSTGRES_DB
-            value: "airflow"
-      nodeSelector:
-        kubernetes.io/os: "{{ .Values.node_selector.os }}"
 ---
 # LoadBalancer
 apiVersion: v1

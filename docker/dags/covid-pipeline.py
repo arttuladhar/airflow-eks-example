@@ -9,7 +9,7 @@ args = {
 }
 
 dag = DAG(
-    'citi-bike-pipeline-k8s',
+    'covid-pipeline',
     default_args=args,
     description='Spark Submit job to EMR',
     schedule_interval=None,
@@ -42,7 +42,7 @@ configure_job = KubernetesPodOperator(namespace='default',
     do_xcom_push=False,
     image_pull_policy='Always',
     secrets=[env_var_secret1, env_var_secret2],
-    env_vars={'DATA_PRODUCT':'citi_bike'},
+    env_vars={'DATA_PRODUCT':'covid'},
     dag=dag
 )
 
@@ -55,7 +55,7 @@ spark_submit_task = KubernetesPodOperator(namespace='default',
     in_cluster=True,
     do_xcom_push=False,
     image_pull_policy='Always',
-    env_vars={'DATA_PRODUCT':'citi_bike'},
+    env_vars={'DATA_PRODUCT':'covid'},
     get_logs=True,
     dag=dag
 )

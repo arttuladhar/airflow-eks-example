@@ -41,19 +41,19 @@ kubectl port-forward svc/airflow 8080:80
 
 Update `utils/build.sh` with `ECR_BASE_URL` with any name
 
-Create EKS Cluster without Fargate Profile
+Create EKS Cluster
 
 ```shell
-# AWS_PROFILE=<PROFILE_NAME> eksctl create cluster --name <CLUSTER_NAME> --version 1.17
-AWS_PROFILE=airflow_eks eksctl create cluster --name art-eks --version 1.17
+# eksctl create cluster --name <CLUSTER_NAME> --version 1.17
+eksctl create cluster --name art-eks --managed
 ```
 
 Switch your kubectl to use newly created EKS Cluster
    
 ```shell
 # Update KubeConfig
-# aws eks --region <REGION> update-kubeconfig --name <EKS CLUSTER NAME> --profile <AWS_PROFILE>
-aws eks --region us-east-2 update-kubeconfig --name art-eks --profile airflow_eks
+# aws eks --region <REGION> update-kubeconfig --name <EKS CLUSTER NAME>
+aws eks --region us-east-2 update-kubeconfig --name art-eks
 
 # Set Context to New EKS Cluster
 # kubectl config set-context <EKS CLUSTER ARN>
@@ -64,27 +64,30 @@ Create Fargate Profile and Namespace
 
 ```shell
 # eksctl create fargateprofile --cluster <CLUSTER_NAME> --name <FARGATE_PROFILE_NAME> --namespace <NAMESPACE> --labels key=value
-eksctl create fargateprofile --cluster art-eks --name airflow_dag --namespace fargate
+eksctl create fargateprofile --cluster art-eks --name fargate --namespace fargate
 
 # Create Kubernetes Namespace
-kubectl create namespace 
+kubectl create namespace fargate
 ```
 
+<!--
 Create ECR for Docker Images
 
 ```shell
 # aws ecr create-repository --repository-name <repo-name>
 aws ecr create-repository --repository-name art-airflow
 ```
+ -->
 
 Copy the repositoryURL
 
-Update `utils/build.sh` with `ECR_BASE_URL` and run script
+Update `utils/buildAndDeploy.sh` with `ECR_BASE_URL` and run script
 ```
 ./utils/build.sh
 ```
 
 Update Helm Chart values under `helm/airflow-eks/values.yaml`  and Install Airflow via Helm
+
 ```
 helm install airflow-eks helm/airflow-eks
 ```

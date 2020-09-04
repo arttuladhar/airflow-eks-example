@@ -1,7 +1,7 @@
 # URL of the Dag ECR repository
 dags_image:
-  # repository: 020886952569.dkr.ecr.us-east-2.amazonaws.com/art-airflow
-  repository: localhost:5000/art-airflow-local
+  repository: 020886952569.dkr.ecr.us-east-2.amazonaws.com/airflow
+  # repository: localhost:5000/art-airflow-local
   tag: latest
 
 # This selector value defines what Airflow will run on. In our case, we wanted to deploy Airflow to all of our EC2 instances,

@@ -27,7 +27,7 @@ def configure_job(cluster_id, data_product):
     if data_product == 'citi_bike':
         s3_jar_path = 's3://art-emr-configuration-scripts/CitiBikeDataProduct-assembly-0.1.jar'
     elif data_product == 'covid':
-        s3_jar_path = 's3://emr-configuration-scripts/SparkPractice-assembly-0.1.jar'
+        s3_jar_path = 's3://art-emr-configuration-scripts/SparkPractice-assembly-0.1.jar'
     else:
         raise RuntimeError("Invalid data_product Option")
         
@@ -62,7 +62,6 @@ def spark_submit(cluster_id, data_product):
         print("SPARK SUBMIT JOB COMPLETED SUCCESSFULLY")
 
 def terminate_cluster(cluster_id):
-    cluster_id = ti.xcom_pull(task_ids='create_cluster')
     EmrClusterController.terminate_cluster(cluster_id)
 
 if __name__ == "__main__":
@@ -71,7 +70,7 @@ if __name__ == "__main__":
 
     if os.environ["DATA_PRODUCT"]=='citi_bike':
         data_product = "citi_bike"
-    if os.environ["DATA_PRODUCT"]=='covid':
+    elif os.environ["DATA_PRODUCT"]=='covid':
         data_product = "covid"
     else:
         raise RuntimeError("Invalid ENV Variable - Please set appropriate DATA_PRODUCT ENV")
@@ -80,7 +79,7 @@ if __name__ == "__main__":
 
     if option == "create_cluster":
         print ("Create EMR Cluster")
-        cluster_id = create_EMR_cluster("Citi Bike Cluster", "emr-5.30.0")
+        cluster_id = create_EMR_cluster(data_product + " Cluster", "emr-5.30.0")
     
     elif option == "configure_job":
         print ("Configuring Job")

@@ -15,8 +15,7 @@ default_args = {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG(
-    'kubernetes_fargate_sample', default_args=default_args, schedule_interval=timedelta(minutes=10))
+dag = DAG('kubernetes_fargate_sample', default_args=default_args, schedule_interval=timedelta(minutes=10))
 
 
 start = DummyOperator(task_id='run_this_first', dag=dag)

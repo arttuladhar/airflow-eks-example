@@ -1,3 +1,6 @@
+## Create Repo
+aws ecr create-repository --repository-name python-aws
+
 ## Build Docker Image
 ```
 docker build -t python-aws .
